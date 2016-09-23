@@ -62,25 +62,21 @@ class HeatMap {
     mpi_wrapper_->Send(addr, LEFT, LEFT_SEND);
     addr = grids_[working_grid_] + (block_width_+2);
     mpi_wrapper_->Receive(addr, LEFT, LEFT_RECV);
-
     // Send/Receive TOP
     addr = grids_[working_grid_] + (block_width_+2) + 1;
     mpi_wrapper_->Send(addr, TOP, UP_SEND);
     addr = grids_[working_grid_] + 1;
     mpi_wrapper_->Receive(addr, TOP, UP_RECV);
-
     // Send/Receive RIGHT
     addr = grids_[working_grid_] + 2 * (block_width_+2) - 2;
     mpi_wrapper_->Send(addr, RIGHT, RIGHT_SEND);
     addr = grids_[working_grid_] + 2 * (block_width_+2) - 1;
     mpi_wrapper_->Receive(addr, RIGHT, RIGHT_RECV);
-
     // Send/Receive BOTTOM
     addr = grids_[working_grid_] + (block_height_ * (block_width_+2)) + 1;
     mpi_wrapper_->Send(addr, BOTTOM, DOWN_SEND);
     addr = grids_[working_grid_] + ((block_height_+1) * (block_width_+2)) + 1;
     mpi_wrapper_->Receive(addr, BOTTOM, DOWN_RECV);
-
     return 0;
   }
 
@@ -103,23 +99,9 @@ class HeatMap {
   }
 
   int StandaloneUpdate() {
-    // double val[4];  // Four values, LEFT, TOP, RIGHT, BOTTOM cell
-    // double old_val = 0.0, new_val = 0.0;
-    // int wg = working_grid_, g = 1 - working_grid_;
-    for (unsigned int i = 2; i != block_height_; ++i) {
-      for (unsigned int j = 2; j != block_width_; ++j) {
+    for (unsigned int i = 2; i != block_height_; ++i)
+      for (unsigned int j = 2; j != block_width_; ++j)
         CellUpdate(i, j);
-        // GetCellValue(i, j, wg, &old_val);
-        // GetCellValue(i, j-1, wg, &val[LEFT]);
-        // GetCellValue(i-1, j, wg, &val[TOP]);
-        // GetCellValue(i, j+1, wg, &val[RIGHT]);
-        // GetCellValue(i+1, j, wg, &val[BOTTOM]);
-        // new_val = old_val
-        //           + 0.1 * (val[TOP] + val[BOTTOM] - 2.0 * old_val)
-        //           + 0.1 * (val[RIGHT] + val[LEFT] - 2.0 * old_val);
-        // SetCellValue(i, j, g, new_val);
-      }
-    }
     return 0;
   }
 
@@ -136,31 +118,16 @@ class HeatMap {
   }
 
   int CollaborativeUpdate() {
-    // double val[4];  // Four values, LEFT, TOP, RIGHT, BOTTOM cell
-    // double old_val = 0.0, new_val = 0.0;
-    // int wg = working_grid_, g = 1 - working_grid_;
     // Update top and bottom rows
     for (unsigned int j = 1; j != 1+block_width_; ++j) {
       CellUpdate(1, j);
       CellUpdate(block_height_, j);
     }
-
     // Update left and right columns
     for (unsigned int i = 1; i != 1+block_height_; ++i) {
       CellUpdate(i, 1);
       CellUpdate(i, block_width_);
     }
-      // GetCellValue(i, j, wg, &old_val);
-      // GetCellValue(i, j-1, wg, &val[LEFT]);
-      // GetCellValue(i-1, j, wg, &val[TOP]);
-      // GetCellValue(i, j+1, wg, &val[RIGHT]);
-      // GetCellValue(i+1, j, wg, &val[BOTTOM]);
-      // new_val = old_val
-                // + 0.1 * (val[TOP] + val[BOTTOM] - 2.0 * old_val)
-                // + 0.1 * (val[RIGHT] + val[LEFT] - 2.0 * old_val);
-      // SetCellValue(i, j, g, new_val);
-    // }
-
     return 0;
   }
 
