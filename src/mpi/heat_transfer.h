@@ -38,7 +38,7 @@ class HeatTransfer {
   int Run() {
     double mpi_time_start, mpi_time_end, local_time, global_time;
     int converged_local = 0, converged_global = 0;
-    int convergence_check = sqrt(steps_);
+    int convergence_check = std::sqrt(steps_);
 
     // Wait until all workers reach this point
     mpi_wrapper_.Barrier();
@@ -50,9 +50,8 @@ class HeatTransfer {
     for (int i = 0; i != steps_; ++i) {
       // If convergence has been reached, then there is no reason to go on
       if (converged_global) {
-        char msg[64];
-        std::sprintf(msg, "Convergence was reached after %d iterations!\n", i);
-        mpi_wrapper_.PrintRoot(stdout, msg);
+        mpi_wrapper_.PrintRoot(stdout,
+            "Convergence was reached after %d iterations!\n", i);
         break;
       }
       // Send and Receive messages (non-blocking)
@@ -78,18 +77,18 @@ class HeatTransfer {
     // Stop timer
     mpi_time_end = MPI_Wtime();
 
-    heat_map_.PrintGrid(0);
-    mpi_wrapper_.Barrier();
-    heat_map_.PrintGrid(1);
-    mpi_wrapper_.Barrier();
-    heat_map_.PrintGrid(2);
-    mpi_wrapper_.Barrier();
-    heat_map_.PrintGrid(3);
-    mpi_wrapper_.Barrier();
+    // for (int i = 0; i != mpi_wrapper_.communication_size(); ++i) {
+    //   heat_map_.PrintGrid(i);
+    //   mpi_wrapper_.Barrier();
+    // }
 
     // Calculate execution time by reducing local times and taking their max
     local_time = mpi_time_end - mpi_time_start;
+    std::fprintf(stderr, "worker%d@%s, time: %.2f\n", mpi_wrapper_.rank(),
+                 mpi_wrapper_.processor_name(), local_time);
     mpi_wrapper_.ReduceTime(&local_time, &global_time);
+
+    mpi_wrapper_.PrintRoot(stdout, "\nElapsed time: %.2f sec\n", global_time);
 
     return 0;
   }

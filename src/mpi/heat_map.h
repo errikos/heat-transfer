@@ -133,13 +133,13 @@ class HeatMap {
 
   int CheckConvergence(int *converged) const {
     double val1, val2;
-    *converged = 0;
+    *converged = 1;
     for (unsigned int i = 1; i != 1+block_height_; ++i)
       for (unsigned int j = 1; j != 1+block_width_; ++j) {
         GetCellValue(i, j, working_grid_, &val1);
         GetCellValue(i, j, 1 - working_grid_, &val2);
-        if (std::fabs(val1 - val2) < 0.001f) {
-          *converged = 1;
+        if (std::fabs(val1 - val2) > 0.001f) {
+          *converged = 0;
           return 0;
         }
       }
@@ -154,11 +154,12 @@ class HeatMap {
     if (mpi_wrapper_->rank() == rank) {
       double val;
       for (int g = 0; g != 2; ++g) {
-        std::printf("=== Ext. Block %d of worker: %d\n", g, rank);
+        std::printf("=== Ext. Block %d of worker%d@%s\n", g, rank,
+                    mpi_wrapper_->processor_name());
         for (unsigned int i = 0; i != block_height_+2; ++i) {
           for (unsigned int j = 0; j != block_width_+2; ++j) {
             GetCellValue(i, j, g, &val);
-            std::printf("  %.2f", val);
+            std::printf("  %7.2f", val);
           }
           std::printf("\n");
         }

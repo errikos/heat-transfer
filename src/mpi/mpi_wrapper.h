@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstring>
 #include <mpi.h>
+#include <cstdarg>
 #include "macros.h"
 
 namespace heat_transfer {
@@ -29,6 +30,9 @@ class MPIWrapper {
     MPI_Init(NULL, NULL);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
     MPI_Comm_size(MPI_COMM_WORLD, &comm_sz_);
+
+    int n;
+    MPI_Get_processor_name(processor_name_, &n);
 
     neighbors_[LEFT] = MPI_PROC_NULL;
     neighbors_[TOP] = MPI_PROC_NULL;
@@ -165,9 +169,9 @@ class MPIWrapper {
     return MPI_Allreduce(
         local_flag,   // send buffer
         global_flag,  // recv buffer
-        1,             // count
+        1,            // count
         MPI_INT,      // datatype (int-bool)
-        MPI_MIN,       // operator
+        MPI_MIN,      // operator
         topology_comm_);
   }
 
@@ -178,8 +182,13 @@ class MPIWrapper {
     return MPI_Barrier(topology_comm_);
   }
 
-  int PrintRoot(FILE *fp, const char *msg) const {
-    if (rank_ == 0) std::fprintf(fp, msg);
+  int PrintRoot(FILE *fp, const char *format, ...) const {
+    if (rank_ == 0) {
+      va_list argptr;
+      va_start(argptr, format);
+      std::vfprintf(fp, format, argptr);
+      va_end(argptr);
+    }
     return 0;
   }
 
@@ -193,6 +202,14 @@ class MPIWrapper {
 
   int rank() const {
     return rank_;
+  }
+
+  int communication_size() const {
+    return comm_sz_;
+  }
+
+  const char *processor_name() const {
+    return processor_name_;
   }
 
   int topology_coord_x() const {
@@ -242,6 +259,7 @@ class MPIWrapper {
 
   int rank_;  // Current process rank
   int comm_sz_;  // Communicator size
+  char processor_name_[MPI_MAX_PROCESSOR_NAME];
 
   int topology_height_;  // Cartesian topology height
   int topology_width_;  // Cartesian topology width
