@@ -123,13 +123,16 @@ class HeatMap {
   }
 
   int CollaborativeUpdate() {
+    double *grid0 = grids_[0], *grid1 = grids_[1];
     // Update top and bottom rows
-    for (unsigned int j = 1; j != 1+block_width_; ++j) {
+    #pragma omp parallel for shared(grid0, grid1) schedule(auto) collapse(1)
+    for (unsigned int j = 1; j < 1+block_width_; ++j) {
       CellUpdate(1, j);
       CellUpdate(block_height_, j);
     }
     // Update left and right columns
-    for (unsigned int i = 1; i != 1+block_height_; ++i) {
+    #pragma omp parallel for shared(grid0, grid1) schedule(auto) collapse(1)
+    for (unsigned int i = 1; i < 1+block_height_; ++i) {
       CellUpdate(i, 1);
       CellUpdate(i, block_width_);
     }

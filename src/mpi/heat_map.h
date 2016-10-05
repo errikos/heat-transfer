@@ -81,7 +81,7 @@ class HeatMap {
   }
 
   int CellUpdate(unsigned int i, unsigned int j) {
-    double val[4];  // Four values, LEFT, TOP, RIGHT, BOTTOM cell
+    double val[4] = { 0.0 };  // Four values, LEFT, TOP, RIGHT, BOTTOM cell
     double old_val = 0.0, new_val = 0.0;
     int wg = working_grid_, g = 1 - working_grid_;
 
@@ -132,7 +132,7 @@ class HeatMap {
   }
 
   int CheckConvergence(int *converged) const {
-    double val1, val2;
+    double val1 = 0.0, val2 = 0.0;
     *converged = 1;
     for (unsigned int i = 1; i != 1+block_height_; ++i)
       for (unsigned int j = 1; j != 1+block_width_; ++j) {

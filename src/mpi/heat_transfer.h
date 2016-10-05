@@ -77,11 +77,6 @@ class HeatTransfer {
     // Stop timer
     mpi_time_end = MPI_Wtime();
 
-    // for (int i = 0; i != mpi_wrapper_.communication_size(); ++i) {
-    //   heat_map_.PrintGrid(i);
-    //   mpi_wrapper_.Barrier();
-    // }
-
     // Calculate execution time by reducing local times and taking their max
     local_time = mpi_time_end - mpi_time_start;
     std::fprintf(stderr, "worker%d@%s, time: %.2f\n", mpi_wrapper_.rank(),

@@ -1,5 +1,5 @@
 CXX = mpicxx
-CXXFLAGS = -pedantic -Wall -fopenmp -Wno-long-long -Wno-format-security
+CXXFLAGS = -pedantic -Wall -fopenmp -Wno-long-long -Wno-format-security -Wno-unused-variable
 
 HDRS = macros.h heat_transfer.h heat_map.h mpi_wrapper.h optparse.h
 SRCS = hybrid.cc
