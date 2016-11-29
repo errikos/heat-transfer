@@ -5,25 +5,26 @@
 #include <stdlib.h>
 #include <sys/time.h>
 typedef timeval timestamp;
-inline timestamp getTimestamp(void){
-	timeval t;
-	gettimeofday(&t, NULL);
-	return t;
+inline timestamp getTimestamp(void) {
+    timeval t;
+    gettimeofday(&t, NULL);
+    return t;
 }
 inline float getElapsedTime(timestamp t) {
-	timeval tn;
-	gettimeofday(&tn, NULL);
-	return (tn.tv_sec - t.tv_sec) * 1000.0f + (tn.tv_usec - t.tv_usec) / 1000.0f;
+    timeval tn;
+    gettimeofday(&tn, NULL);
+    return (tn.tv_sec - t.tv_sec) * 1000.0f +
+           (tn.tv_usec - t.tv_usec) / 1000.0f;
 }
 #else
 #include <time.h>
 typedef clock_t timestamp;
-inline timestamp getTimestamp(void){
-	return clock();
+inline timestamp getTimestamp(void) {
+    return clock();
 }
 inline float getElapsedtime(timestamp t) {
-	return ((float)clock() - t) / CLOCKS_PER_SEC * 1000.0f;
+    return ((float)clock() - t) / CLOCKS_PER_SEC * 1000.0f;
 }
 #endif
 
-#endif  // __TIMESTAMP_H_
+#endif // __TIMESTAMP_H_
